@@ -1,32 +1,41 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Logo } from "@/components/site/logo";
 import { createClient } from "@/lib/supabase/server";
+import { AppHeader } from "@/components/app/app-header";
+import { CreateStudio } from "@/components/create/create-studio";
+import { TRIAL_GENERATION_LIMIT } from "@/lib/constants";
 
-export default async function CreateStubPage() {
+export const metadata: Metadata = { title: "Créer" };
+
+const PREMIUM_STATUSES = ["trialing", "active", "lifetime"];
+
+export default async function CreatePage() {
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/auth/signup");
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("subscription_status, generations_used_trial")
+    .eq("id", user.id)
+    .single();
+
+  const isPremium = PREMIUM_STATUSES.includes(
+    profile?.subscription_status ?? "free",
+  );
+  const remaining = Math.max(
+    0,
+    TRIAL_GENERATION_LIMIT - (profile?.generations_used_trial ?? 0),
+  );
+
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-10">
-      <Link href="/" aria-label="Accueil">
-        <Logo />
-      </Link>
-      <div className="my-auto rounded-3xl bg-surface p-8 text-center ring-1 ring-hairline">
-        <h1 className="font-display text-2xl font-bold tracking-tight">
-          Bienvenue 👋
-        </h1>
-        <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-          Connecté en tant que <span className="text-ink">{user.email}</span>.
-          L&apos;éditeur (upload + prompt + génération) arrive à l&apos;étape 5.
-        </p>
-        <p className="mt-4 break-all font-mono text-[11px] text-ink-faint">
-          user.id : {user.id}
-        </p>
-      </div>
-    </main>
+    <div>
+      <AppHeader />
+      <main>
+        <CreateStudio remaining={remaining} isPremium={isPremium} />
+      </main>
+    </div>
   );
 }
