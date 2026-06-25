@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Wand2, Loader2 } from "lucide-react";
 import { ImageDrop } from "@/components/create/image-drop";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ export function CreateStudio({
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const router = useRouter();
 
   const outOfCredits = !isPremium && remaining <= 0;
   const canGenerate = !!source && prompt.trim().length > 0 && !outOfCredits && !busy;
@@ -44,14 +46,29 @@ export function CreateStudio({
       setError("Tu as utilisé toutes tes générations d'essai.");
       return;
     }
-    // Étapes 6–7 : modération (prompt + image) → upload → /api/generate → /processing
     setBusy(true);
-    setTimeout(() => {
+    try {
+      const fd = new FormData();
+      fd.append("source", source);
+      if (reference) fd.append("reference", reference);
+      fd.append("prompt", prompt.trim());
+
+      const res = await fetch("/api/generate", { method: "POST", body: fd });
+      const data = (await res.json().catch(() => ({}))) as {
+        id?: string;
+        error?: string;
+      };
+
+      if (!res.ok || !data.id) {
+        setError(data.error ?? "La génération a échoué. Réessaie.");
+        setBusy(false);
+        return;
+      }
+      router.push(`/result?id=${data.id}`);
+    } catch {
+      setError("Erreur réseau. Vérifie ta connexion et réessaie.");
       setBusy(false);
-      setInfo(
-        "Tout est prêt ✨ La modération et la génération IA seront branchées aux étapes 6-7.",
-      );
-    }, 600);
+    }
   }
 
   return (
