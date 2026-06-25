@@ -14,9 +14,6 @@ export const TRIAL_GENERATION_LIMIT = Number(
   process.env.NEXT_PUBLIC_TRIAL_GENERATION_LIMIT ?? 5,
 );
 
-/** Âge en dessous duquel un consentement parental est requis. */
-export const PARENTAL_CONSENT_AGE = 15;
-
 /** Suggestions de prompts affichées sur la page de création (chips). */
 export const PROMPT_SUGGESTIONS = [
   "Change le fond",

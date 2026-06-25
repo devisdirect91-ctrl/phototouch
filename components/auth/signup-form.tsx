@@ -1,12 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ShieldAlert } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { isValidBirthDate, requiresParentalConsent } from "@/lib/age";
-import { cn } from "@/lib/utils";
 
 const inputClass =
   "w-full rounded-xl bg-surface-raised px-4 py-3 text-ink ring-1 ring-hairline placeholder:text-ink-faint transition focus:outline-none focus:ring-2 focus:ring-brand-bright/70";
@@ -34,22 +32,9 @@ export function SignupForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [parentEmail, setParentEmail] = useState("");
-  const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
-
-  const needsConsent = useMemo(
-    () =>
-      birthDate !== "" &&
-      isValidBirthDate(birthDate) &&
-      requiresParentalConsent(birthDate),
-    [birthDate],
-  );
-
-  const today = new Date().toISOString().slice(0, 10);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,30 +45,13 @@ export function SignupForm() {
       setError("Le mot de passe doit faire au moins 8 caractères.");
       return;
     }
-    if (!birthDate || !isValidBirthDate(birthDate)) {
-      setError("Indique une date de naissance valide.");
-      return;
-    }
-    if (needsConsent && (!parentEmail || !consent)) {
-      setError(
-        "Consentement parental requis : renseigne l'email d'un parent et coche la case.",
-      );
-      return;
-    }
 
     setLoading(true);
     const supabase = createClient();
     const { data, error: err } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
-        data: {
-          birth_date: birthDate,
-          parental_consent: needsConsent ? consent : false,
-          parent_email: needsConsent ? parentEmail : null,
-        },
-      },
+      options: { emailRedirectTo: `${location.origin}/auth/callback` },
     });
     setLoading(false);
 
@@ -162,56 +130,6 @@ export function SignupForm() {
           placeholder="8 caractères minimum"
         />
       </div>
-
-      <div>
-        <label htmlFor="birthDate" className="mb-1.5 block text-sm text-ink-muted">
-          Date de naissance
-        </label>
-        <input
-          id="birthDate"
-          type="date"
-          required
-          max={today}
-          value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
-          className={cn(inputClass, "[color-scheme:dark]")}
-        />
-      </div>
-
-      {needsConsent && (
-        <div className="space-y-3 rounded-xl bg-brand/10 p-4 ring-1 ring-brand/30">
-          <p className="flex items-start gap-2 text-sm text-ink">
-            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-brand-bright" />
-            Tu as moins de 15 ans : l&apos;accord d&apos;un parent ou tuteur est
-            nécessaire.
-          </p>
-          <div>
-            <label
-              htmlFor="parentEmail"
-              className="mb-1.5 block text-sm text-ink-muted"
-            >
-              Email d&apos;un parent / tuteur
-            </label>
-            <input
-              id="parentEmail"
-              type="email"
-              value={parentEmail}
-              onChange={(e) => setParentEmail(e.target.value)}
-              className={inputClass}
-              placeholder="parent@exemple.com"
-            />
-          </div>
-          <label className="flex items-start gap-2 text-sm text-ink-muted">
-            <input
-              type="checkbox"
-              checked={consent}
-              onChange={(e) => setConsent(e.target.checked)}
-              className="mt-0.5 h-4 w-4 accent-brand"
-            />
-            Mon parent / tuteur autorise la création de ce compte.
-          </label>
-        </div>
-      )}
 
       {error && (
         <p role="alert" className="text-sm text-danger">
