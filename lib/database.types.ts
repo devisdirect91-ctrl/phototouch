@@ -1,6 +1,5 @@
 // Types de la base Supabase.
-// Écrits à la main pour l'étape 2 — à régénérer via le MCP Supabase
-// (ou `supabase gen types typescript`) une fois la migration appliquée.
+// Généré via le MCP Supabase (generate_typescript_types) — régénérer après toute migration.
 
 export type Json =
   | string
@@ -9,6 +8,180 @@ export type Json =
   | null
   | { [key: string]: Json | undefined }
   | Json[];
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5";
+  };
+  public: {
+    Tables: {
+      generations: {
+        Row: {
+          created_at: string;
+          id: string;
+          model_used: string | null;
+          moderation_passed: boolean | null;
+          prompt: string | null;
+          reference_image_url: string | null;
+          result_image_url: string | null;
+          source_image_url: string | null;
+          status: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          model_used?: string | null;
+          moderation_passed?: boolean | null;
+          prompt?: string | null;
+          reference_image_url?: string | null;
+          result_image_url?: string | null;
+          source_image_url?: string | null;
+          status?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          model_used?: string | null;
+          moderation_passed?: boolean | null;
+          prompt?: string | null;
+          reference_image_url?: string | null;
+          result_image_url?: string | null;
+          source_image_url?: string | null;
+          status?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "generations_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      moderation_logs: {
+        Row: {
+          created_at: string;
+          generation_id: string | null;
+          id: string;
+          passed: boolean;
+          reason: string | null;
+          type: string;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          generation_id?: string | null;
+          id?: string;
+          passed: boolean;
+          reason?: string | null;
+          type: string;
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          generation_id?: string | null;
+          id?: string;
+          passed?: boolean;
+          reason?: string | null;
+          type?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "moderation_logs_generation_id_fkey";
+            columns: ["generation_id"];
+            isOneToOne: false;
+            referencedRelation: "generations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "moderation_logs_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      profiles: {
+        Row: {
+          birth_date: string | null;
+          created_at: string;
+          current_period_end: string | null;
+          email: string | null;
+          generations_used_trial: number;
+          id: string;
+          is_admin: boolean;
+          parent_email: string | null;
+          parental_consent: boolean;
+          stripe_customer_id: string | null;
+          subscription_id: string | null;
+          subscription_status: string;
+          trial_ends_at: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          birth_date?: string | null;
+          created_at?: string;
+          current_period_end?: string | null;
+          email?: string | null;
+          generations_used_trial?: number;
+          id: string;
+          is_admin?: boolean;
+          parent_email?: string | null;
+          parental_consent?: boolean;
+          stripe_customer_id?: string | null;
+          subscription_id?: string | null;
+          subscription_status?: string;
+          trial_ends_at?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          birth_date?: string | null;
+          created_at?: string;
+          current_period_end?: string | null;
+          email?: string | null;
+          generations_used_trial?: number;
+          id?: string;
+          is_admin?: boolean;
+          parent_email?: string | null;
+          parental_consent?: boolean;
+          stripe_customer_id?: string | null;
+          subscription_id?: string | null;
+          subscription_status?: string;
+          trial_ends_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      delete_expired_source_images: { Args: never; Returns: undefined };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
+};
+
+// ─────────────────────────────────────────────
+//  Raccourcis & unions applicatives (miroir des CHECK constraints)
+// ─────────────────────────────────────────────
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type Generation = Database["public"]["Tables"]["generations"]["Row"];
+export type ModerationLog = Database["public"]["Tables"]["moderation_logs"]["Row"];
 
 export type SubscriptionStatus =
   | "free"
@@ -26,139 +199,3 @@ export type GenerationStatus =
   | "blocked";
 
 export type ModerationType = "prompt" | "source_image" | "result_image";
-
-export interface Database {
-  public: {
-    Tables: {
-      profiles: {
-        Row: {
-          id: string;
-          email: string | null;
-          birth_date: string | null;
-          parental_consent: boolean;
-          parent_email: string | null;
-          stripe_customer_id: string | null;
-          subscription_status: SubscriptionStatus;
-          subscription_id: string | null;
-          trial_ends_at: string | null;
-          current_period_end: string | null;
-          generations_used_trial: number;
-          is_admin: boolean;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id: string;
-          email?: string | null;
-          birth_date?: string | null;
-          parental_consent?: boolean;
-          parent_email?: string | null;
-          stripe_customer_id?: string | null;
-          subscription_status?: SubscriptionStatus;
-          subscription_id?: string | null;
-          trial_ends_at?: string | null;
-          current_period_end?: string | null;
-          generations_used_trial?: number;
-          is_admin?: boolean;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          email?: string | null;
-          birth_date?: string | null;
-          parental_consent?: boolean;
-          parent_email?: string | null;
-          stripe_customer_id?: string | null;
-          subscription_status?: SubscriptionStatus;
-          subscription_id?: string | null;
-          trial_ends_at?: string | null;
-          current_period_end?: string | null;
-          generations_used_trial?: number;
-          is_admin?: boolean;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      generations: {
-        Row: {
-          id: string;
-          user_id: string;
-          source_image_url: string | null;
-          reference_image_url: string | null;
-          prompt: string | null;
-          result_image_url: string | null;
-          status: GenerationStatus;
-          moderation_passed: boolean | null;
-          model_used: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          source_image_url?: string | null;
-          reference_image_url?: string | null;
-          prompt?: string | null;
-          result_image_url?: string | null;
-          status?: GenerationStatus;
-          moderation_passed?: boolean | null;
-          model_used?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          source_image_url?: string | null;
-          reference_image_url?: string | null;
-          prompt?: string | null;
-          result_image_url?: string | null;
-          status?: GenerationStatus;
-          moderation_passed?: boolean | null;
-          model_used?: string | null;
-          created_at?: string;
-        };
-        Relationships: [];
-      };
-      moderation_logs: {
-        Row: {
-          id: string;
-          user_id: string | null;
-          generation_id: string | null;
-          type: ModerationType;
-          passed: boolean;
-          reason: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id?: string | null;
-          generation_id?: string | null;
-          type: ModerationType;
-          passed: boolean;
-          reason?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string | null;
-          generation_id?: string | null;
-          type?: ModerationType;
-          passed?: boolean;
-          reason?: string | null;
-          created_at?: string;
-        };
-        Relationships: [];
-      };
-    };
-    Views: Record<string, never>;
-    Functions: Record<string, never>;
-    Enums: Record<string, never>;
-    CompositeTypes: Record<string, never>;
-  };
-}
-
-// Raccourcis pratiques
-export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
-export type Generation = Database["public"]["Tables"]["generations"]["Row"];
-export type ModerationLog = Database["public"]["Tables"]["moderation_logs"]["Row"];

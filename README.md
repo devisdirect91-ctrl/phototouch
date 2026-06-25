@@ -51,7 +51,7 @@ supabase/migrations/  schéma SQL (étape 2)
 ## Avancement
 
 - [x] **Étape 1** — Setup projet + design system
-- [~] **Étape 2** — Schéma Supabase + auth (code prêt ; migrations à appliquer via le MCP Supabase)
+- [x] **Étape 2** — Schéma Supabase (migrations appliquées + RLS vérifiée via advisors) + plomberie auth
 - [ ] **Étape 3** — Landing
 - [ ] **Étape 4** — Inscription
 - [ ] **Étape 5** — Création / upload
