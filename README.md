@@ -55,7 +55,7 @@ supabase/migrations/  schéma SQL (étape 2)
 - [x] **Étape 3** — Landing (hero animé, slider avant/après, gratuité mise en avant, mobile-first)
 - [x] **Étape 4** — Inscription (email/mot de passe + OAuth Google/Apple, callback, stub /create auth-gardé)
 - [x] **Étape 5** — Création / upload (drag&drop + preview, prompt + chips, référence optionnelle, compteur d'essai)
-- [ ] **Étape 6** — Modération
+- [x] **Étape 6** — Modération (OpenAI omni-moderation : prompts + images, log `moderation_logs`)
 - [ ] **Étape 7** — API de génération (+ fallback)
 - [ ] **Étape 8** — Animation d'analyse
 - [ ] **Étape 9** — Résultat + paywall
