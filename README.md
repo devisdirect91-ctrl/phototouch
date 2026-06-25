@@ -52,7 +52,7 @@ supabase/migrations/  schéma SQL (étape 2)
 
 - [x] **Étape 1** — Setup projet + design system
 - [x] **Étape 2** — Schéma Supabase (migrations appliquées + RLS vérifiée via advisors) + plomberie auth
-- [ ] **Étape 3** — Landing
+- [x] **Étape 3** — Landing (hero animé, slider avant/après, gratuité mise en avant, mobile-first)
 - [ ] **Étape 4** — Inscription
 - [ ] **Étape 5** — Création / upload
 - [ ] **Étape 6** — Modération
