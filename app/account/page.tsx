@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app/app-header";
@@ -6,6 +7,7 @@ import { BottomNav } from "@/components/app/bottom-nav";
 import { AccountActions } from "@/components/account/account-actions";
 import { hasActiveSubscription } from "@/lib/subscription";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 export const metadata: Metadata = { title: "Profil" };
 
@@ -27,7 +29,7 @@ export default async function AccountPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_status, trial_ends_at, stripe_customer_id")
+    .select("subscription_status, trial_ends_at, stripe_customer_id, is_admin")
     .eq("id", user.id)
     .single();
 
@@ -70,6 +72,15 @@ export default async function AccountPage() {
             </p>
           )}
         </div>
+
+        {profile?.is_admin && (
+          <Link
+            href="/admin"
+            className={cn(buttonVariants({ variant: "secondary" }), "mt-6 w-full")}
+          >
+            Tableau de bord admin
+          </Link>
+        )}
 
         <div className="mt-6">
           <AccountActions hasCustomer={!!profile?.stripe_customer_id} />
