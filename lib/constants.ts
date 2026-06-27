@@ -9,10 +9,15 @@ export const SITE = {
 /** Durée de l'essai gratuit, en jours. */
 export const TRIAL_DAYS = 7;
 
-/** Nombre de générations autorisées pendant l'essai gratuit (contrôle des coûts). */
-export const TRIAL_GENERATION_LIMIT = Number(
-  process.env.NEXT_PUBLIC_TRIAL_GENERATION_LIMIT ?? 5,
-);
+/**
+ * Plafonds internes de génération — NON affichés à l'utilisateur.
+ * free  = 1 « bluff » (animation + flou, sans appel IA réel)
+ * trial = 5 générations réelles
+ * paid  = 30 générations réelles
+ */
+export const FREE_GENERATION_LIMIT = 1;
+export const TRIAL_GENERATION_LIMIT = 5;
+export const PAID_GENERATION_LIMIT = 30;
 
 /** Suggestions de prompts affichées sur la page de création (chips). */
 export const PROMPT_SUGGESTIONS = [

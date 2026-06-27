@@ -25,24 +25,34 @@ function toVerdict(result: ModerationResultLike): ModerationVerdict {
   };
 }
 
-/** Modère un texte (prompt) via OpenAI omni-moderation. */
+/** Modère un texte (prompt) via OpenAI omni-moderation. Fail-open sur erreur API. */
 export async function moderateText(text: string): Promise<ModerationVerdict> {
-  const openai = getOpenAI();
-  const res = await openai.moderations.create({
-    model: "omni-moderation-latest",
-    input: text,
-  });
-  return toVerdict(res.results[0]);
+  try {
+    const openai = getOpenAI();
+    const res = await openai.moderations.create({
+      model: "omni-moderation-latest",
+      input: text,
+    });
+    return toVerdict(res.results[0]);
+  } catch (err) {
+    console.error("[moderation] texte — erreur API:", err);
+    return { flagged: false, reason: "moderation_error" };
+  }
 }
 
-/** Modère une image (URL publique ou data URI) via OpenAI omni-moderation. */
+/** Modère une image (URL publique ou data URI). Fail-open sur erreur API. */
 export async function moderateImage(url: string): Promise<ModerationVerdict> {
-  const openai = getOpenAI();
-  const res = await openai.moderations.create({
-    model: "omni-moderation-latest",
-    input: [{ type: "image_url", image_url: { url } }],
-  });
-  return toVerdict(res.results[0]);
+  try {
+    const openai = getOpenAI();
+    const res = await openai.moderations.create({
+      model: "omni-moderation-latest",
+      input: [{ type: "image_url", image_url: { url } }],
+    });
+    return toVerdict(res.results[0]);
+  } catch (err) {
+    console.error("[moderation] image — erreur API:", err);
+    return { flagged: false, reason: "moderation_error" };
+  }
 }
 
 /**

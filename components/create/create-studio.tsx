@@ -9,13 +9,7 @@ import { PROMPT_SUGGESTIONS } from "@/lib/constants";
 import { setPendingGeneration } from "@/lib/generation-store";
 import { track } from "@/lib/analytics";
 
-export function CreateStudio({
-  remaining,
-  isPremium,
-}: {
-  remaining: number;
-  isPremium: boolean;
-}) {
+export function CreateStudio({ isPremium }: { isPremium: boolean }) {
   const [source, setSource] = useState<File | null>(null);
   const [reference, setReference] = useState<File | null>(null);
   const [prompt, setPrompt] = useState("");
@@ -23,8 +17,7 @@ export function CreateStudio({
   const [busy, setBusy] = useState(false);
   const router = useRouter();
 
-  const outOfCredits = !isPremium && remaining <= 0;
-  const canGenerate = !!source && prompt.trim().length > 0 && !outOfCredits && !busy;
+  const canGenerate = !!source && prompt.trim().length > 0 && !busy;
 
   function addSuggestion(s: string) {
     setPrompt((p) =>
@@ -42,11 +35,6 @@ export function CreateStudio({
       setError("Décris la transformation que tu veux.");
       return;
     }
-    if (outOfCredits) {
-      setError("Tu as utilisé toutes tes générations d'essai.");
-      return;
-    }
-
     track("generation_started");
     setPendingGeneration({ source, reference, prompt: prompt.trim() });
     setBusy(true);
@@ -65,7 +53,7 @@ export function CreateStudio({
           </p>
         </div>
         <span className="shrink-0 rounded-full bg-surface px-3 py-1.5 font-mono text-xs text-ink-muted ring-1 ring-hairline">
-          {isPremium ? "∞ illimité" : `${remaining} restantes`}
+          {isPremium ? "∞ illimité" : "Gratuit"}
         </span>
       </div>
 
@@ -140,9 +128,7 @@ export function CreateStudio({
           <p className="mt-3 text-center text-xs text-ink-faint">
             {isPremium
               ? "Générations illimitées."
-              : outOfCredits
-                ? "Plus de générations d'essai — passe à l'offre complète."
-                : `Il te reste ${remaining} génération${remaining > 1 ? "s" : ""} dans ton essai gratuit.`}
+              : "Ta première transformation est offerte ✨"}
           </p>
         </div>
       </div>

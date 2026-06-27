@@ -7,6 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { AppHeader } from "@/components/app/app-header";
 import { Paywall } from "@/components/result/paywall";
 import { DownloadButton } from "@/components/result/download-button";
+import { FulfillResult } from "@/components/result/fulfill-result";
 import { buttonVariants } from "@/components/ui/button";
 import { hasActiveSubscription } from "@/lib/subscription";
 import { cn } from "@/lib/utils";
@@ -35,14 +36,20 @@ export default async function ResultPage({
     .single();
   if (!gen) redirect("/create");
 
-  // États non finalisés
-  if (gen.status !== "completed" || !gen.result_image_url) {
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("subscription_status")
+    .eq("id", user.id)
+    .single();
+  const isPaid = hasActiveSubscription(profile?.subscription_status);
+  const admin = createAdminClient();
+
+  // Bloqué / échoué
+  if (gen.status === "blocked" || gen.status === "failed") {
     const message =
       gen.status === "blocked"
         ? "Ce contenu a été refusé par la modération."
-        : gen.status === "failed"
-          ? "La génération a échoué."
-          : "Génération en cours…";
+        : "La génération a échoué.";
     return (
       <div>
         <AppHeader />
@@ -61,17 +68,13 @@ export default async function ResultPage({
     );
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("subscription_status")
-    .eq("id", user.id)
-    .single();
-  const isPremium = hasActiveSubscription(profile?.subscription_status);
+  // Payant
+  if (isPaid) {
+    // Bluff payé mais pas encore généré → on lance la vraie génération
+    if (!gen.result_image_url) {
+      return <FulfillResult id={gen.id} />;
+    }
 
-  const admin = createAdminClient();
-
-  // Premium → image nette + téléchargement
-  if (isPremium) {
     const { data: signed } = await admin.storage
       .from("results")
       .createSignedUrl(gen.result_image_url, 3600);
@@ -107,20 +110,22 @@ export default async function ResultPage({
     );
   }
 
-  // Non-premium → aperçu basse résolution flouté (serveur) + paywall
-  const { data: blob } = await admin.storage
-    .from("results")
-    .download(gen.result_image_url);
-
+  // Gratuit (bluff) → aperçu flouté (source stylisée) + paywall
   let previewSrc = "";
-  if (blob) {
-    const buffer = Buffer.from(await blob.arrayBuffer());
-    const preview = await sharp(buffer)
-      .resize(420)
-      .blur(14)
-      .jpeg({ quality: 45 })
-      .toBuffer();
-    previewSrc = `data:image/jpeg;base64,${preview.toString("base64")}`;
+  if (gen.source_image_url) {
+    const { data: blob } = await admin.storage
+      .from("user-uploads")
+      .download(gen.source_image_url);
+    if (blob) {
+      const buffer = Buffer.from(await blob.arrayBuffer());
+      const preview = await sharp(buffer)
+        .resize(420)
+        .modulate({ saturation: 1.35, brightness: 1.05 })
+        .blur(16)
+        .jpeg({ quality: 45 })
+        .toBuffer();
+      previewSrc = `data:image/jpeg;base64,${preview.toString("base64")}`;
+    }
   }
 
   return (
