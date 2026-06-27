@@ -62,4 +62,4 @@ supabase/migrations/  schéma SQL (étape 2)
 - [x] **Étape 10** — Stripe (checkout essai 7j, webhooks → profil, billing portal)
 - [x] **Étape 11** — App connectée (connexion, galerie, profil, billing portal, suppression RGPD, bottom nav)
 - [x] **Étape 12** — Emails Resend + analytics PostHog + pages légales (CGU/Confidentialité)
-- [ ] **Étape 13** — Vérifications finales
+- [x] **Étape 13** — Vérifications finales (lint ✓ · tsc ✓ · build ✓ · secrets serveur-only · `.gitattributes`)
