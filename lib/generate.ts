@@ -7,6 +7,9 @@ const MODEL = process.env.OPENAI_IMAGE_MODEL || "gpt-image-1";
 // Qualité configurable (low | medium | high). low = le moins cher.
 const QUALITY =
   (process.env.OPENAI_IMAGE_QUALITY as "low" | "medium" | "high") || "low";
+// Fidélité à l'image source. "high" préserve sujet/cadrage/fond (un peu plus cher).
+const INPUT_FIDELITY =
+  (process.env.OPENAI_INPUT_FIDELITY as "low" | "high") || "high";
 
 type Size = "1024x1024" | "1024x1536" | "1536x1024";
 
@@ -69,6 +72,7 @@ export async function generateImage({
     prompt,
     size,
     quality: QUALITY,
+    input_fidelity: INPUT_FIDELITY,
   });
 
   const b64 = res.data?.[0]?.b64_json;
