@@ -31,6 +31,7 @@ export async function generateImage({
     image: images,
     prompt,
     size: "1024x1024",
+    quality: "low",
   });
 
   const b64 = res.data?.[0]?.b64_json;
