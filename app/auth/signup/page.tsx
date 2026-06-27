@@ -38,6 +38,13 @@ export default async function SignupPage() {
         <div className="mt-7">
           <SignupForm />
         </div>
+
+        <p className="mt-5 text-center text-sm text-ink-muted">
+          Déjà un compte ?{" "}
+          <Link href="/auth/login" className="text-scan hover:opacity-80">
+            Connecte-toi
+          </Link>
+        </p>
       </div>
     </main>
   );

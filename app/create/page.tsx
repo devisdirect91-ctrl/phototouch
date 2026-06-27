@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app/app-header";
 import { CreateStudio } from "@/components/create/create-studio";
+import { BottomNav } from "@/components/app/bottom-nav";
 import { TRIAL_GENERATION_LIMIT } from "@/lib/constants";
 
 export const metadata: Metadata = { title: "Créer" };
@@ -31,11 +32,12 @@ export default async function CreatePage() {
   );
 
   return (
-    <div>
+    <div className="pb-24">
       <AppHeader />
       <main>
         <CreateStudio remaining={remaining} isPremium={isPremium} />
       </main>
+      <BottomNav />
     </div>
   );
 }

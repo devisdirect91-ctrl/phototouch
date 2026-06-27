@@ -60,6 +60,6 @@ supabase/migrations/  schéma SQL (étape 2)
 - [x] **Étape 8** — Animation d'analyse (`/processing` : scan de la photo, particules, progression, statuts cyclés, retry)
 - [x] **Étape 9** — Résultat + paywall (premium net + download ; non-premium flouté côté serveur via `sharp`, gratuité mise en avant)
 - [x] **Étape 10** — Stripe (checkout essai 7j, webhooks → profil, billing portal)
-- [ ] **Étape 11** — App connectée (galerie, profil)
+- [x] **Étape 11** — App connectée (connexion, galerie, profil, billing portal, suppression RGPD, bottom nav)
 - [ ] **Étape 12** — Emails + analytics + pages légales
 - [ ] **Étape 13** — Vérifications finales
