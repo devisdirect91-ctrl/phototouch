@@ -15,6 +15,8 @@ const STATUSES = [
   "Génération en cours…",
   "Vérification du résultat…",
   "Finalisation…",
+  "Derniers détails…",
+  "Presque prêt ✨",
 ];
 const MIN_MS = 3500;
 
@@ -89,7 +91,9 @@ export default function ProcessingPage() {
   useEffect(() => {
     if (error) return;
     const t = setInterval(() => {
-      setProgress((p) => (p < 92 ? p + (92 - p) * 0.05 + 0.3 : p));
+      setProgress((p) =>
+        p >= 99 ? p : Math.min(99, p + Math.max(0.15, (99 - p) * 0.04)),
+      );
     }, 250);
     return () => clearInterval(t);
   }, [error]);
