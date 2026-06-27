@@ -37,8 +37,13 @@ export default async function AdminPage() {
     admin.from("profiles").select("*", { count: "exact", head: true });
   const g = () =>
     admin.from("generations").select("*", { count: "exact", head: true });
+  const pv = () =>
+    admin.from("page_views").select("*", { count: "exact", head: true });
 
   const [
+    visitsTotal,
+    visits7,
+    visits30,
     usersTotal,
     users7,
     users30,
@@ -51,6 +56,9 @@ export default async function AdminPage() {
     gensBlocked,
     gensFailed,
   ] = await Promise.all([
+    c(pv()),
+    c(pv().gte("created_at", since7)),
+    c(pv().gte("created_at", since30)),
     c(p()),
     c(p().gte("created_at", since7)),
     c(p().gte("created_at", since30)),
@@ -68,37 +76,47 @@ export default async function AdminPage() {
     usersTotal > 0 ? (((trial + paid) / usersTotal) * 100).toFixed(1) : "0";
   const mrr = (paid * PRICE_MONTHLY).toFixed(0);
 
-  const sections: { title: string; stats: { label: string; value: string; hint?: string }[] }[] =
-    [
-      {
-        title: "Utilisateurs",
-        stats: [
-          { label: "Total", value: String(usersTotal) },
-          { label: "Nouveaux (7 j)", value: `+${users7}` },
-          { label: "Nouveaux (30 j)", value: `+${users30}` },
-        ],
-      },
-      {
-        title: "Abonnements",
-        stats: [
-          { label: "Gratuit", value: String(free) },
-          { label: "Essai en cours", value: String(trial) },
-          { label: "Payant", value: String(paid) },
-          { label: "Conversion", value: `${conversion}%`, hint: "essai+payant / total" },
-          { label: "Revenu mensuel", value: `≈ ${mrr} €`, hint: "estimation" },
-        ],
-      },
-      {
-        title: "Générations",
-        stats: [
-          { label: "Total", value: String(gensTotal) },
-          { label: "Réelles (payées)", value: String(gensReal) },
-          { label: "Bluffs (gratuit)", value: String(gensBluff) },
-          { label: "Bloquées (modération)", value: String(gensBlocked) },
-          { label: "Échouées", value: String(gensFailed) },
-        ],
-      },
-    ];
+  const sections: {
+    title: string;
+    stats: { label: string; value: string; hint?: string }[];
+  }[] = [
+    {
+      title: "Visites",
+      stats: [
+        { label: "Total", value: String(visitsTotal) },
+        { label: "7 jours", value: String(visits7) },
+        { label: "30 jours", value: String(visits30) },
+      ],
+    },
+    {
+      title: "Utilisateurs",
+      stats: [
+        { label: "Total", value: String(usersTotal) },
+        { label: "Nouveaux (7 j)", value: `+${users7}` },
+        { label: "Nouveaux (30 j)", value: `+${users30}` },
+      ],
+    },
+    {
+      title: "Abonnements",
+      stats: [
+        { label: "Gratuit", value: String(free) },
+        { label: "Essai en cours", value: String(trial) },
+        { label: "Payant", value: String(paid) },
+        { label: "Conversion", value: `${conversion}%`, hint: "essai+payant / total" },
+        { label: "Revenu mensuel", value: `≈ ${mrr} €`, hint: "estimation" },
+      ],
+    },
+    {
+      title: "Générations",
+      stats: [
+        { label: "Total", value: String(gensTotal) },
+        { label: "Réelles (payées)", value: String(gensReal) },
+        { label: "Bluffs (gratuit)", value: String(gensBluff) },
+        { label: "Bloquées (modération)", value: String(gensBlocked) },
+        { label: "Échouées", value: String(gensFailed) },
+      ],
+    },
+  ];
 
   return (
     <div className="pb-24">
@@ -136,22 +154,17 @@ export default async function AdminPage() {
             </section>
           ))}
 
-          <section>
-            <h2 className="font-display text-lg font-semibold tracking-tight text-ink-muted">
-              Trafic & visites
-            </h2>
-            <p className="mt-3 rounded-2xl bg-surface p-4 text-sm leading-relaxed text-ink-muted ring-1 ring-hairline">
-              Les visites ne sont pas stockées en base. Active{" "}
-              <Link
-                href="https://vercel.com/docs/analytics"
-                className="text-scan hover:opacity-80"
-              >
-                Vercel Analytics
-              </Link>{" "}
-              (gratuit, déjà sur ton hébergement) pour le trafic, les sources et
-              les pages vues — dis-moi si tu veux que je le branche.
-            </p>
-          </section>
+          <p className="rounded-2xl bg-surface p-4 text-xs leading-relaxed text-ink-faint ring-1 ring-hairline">
+            Visites comptées en base (hors /admin). Pour le détail du trafic
+            (sources, pages, temps réel), vois{" "}
+            <Link
+              href="https://vercel.com/docs/analytics"
+              className="text-scan hover:opacity-80"
+            >
+              Vercel Analytics
+            </Link>
+            .
+          </p>
         </div>
       </main>
       <BottomNav />

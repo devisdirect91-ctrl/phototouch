@@ -3,6 +3,8 @@ import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/lib/constants";
 import { PostHogProvider } from "@/components/analytics/posthog-provider";
+import { ViewTracker } from "@/components/analytics/view-tracker";
+import { Analytics } from "@vercel/analytics/react";
 
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -55,6 +57,8 @@ export default function RootLayout({
     >
       <body>
         <PostHogProvider>{children}</PostHogProvider>
+        <ViewTracker />
+        <Analytics />
       </body>
     </html>
   );

@@ -109,6 +109,24 @@ export type Database = {
           },
         ];
       };
+      page_views: {
+        Row: {
+          created_at: string;
+          id: string;
+          path: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          path?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          path?: string | null;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           birth_date: string | null;
@@ -182,6 +200,7 @@ export type Database = {
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Generation = Database["public"]["Tables"]["generations"]["Row"];
 export type ModerationLog = Database["public"]["Tables"]["moderation_logs"]["Row"];
+export type PageView = Database["public"]["Tables"]["page_views"]["Row"];
 
 export type SubscriptionStatus =
   | "free"
