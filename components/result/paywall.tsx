@@ -40,9 +40,9 @@ export function Paywall({
         window.location.href = data.url;
         return;
       }
-      setError(data.error ?? "Le paiement Stripe sera actif à l'étape 10.");
+      setError(data.error ?? "Le paiement est momentanément indisponible. Réessaie.");
     } catch {
-      setError("Le paiement Stripe sera actif à l'étape 10.");
+      setError("Le paiement est momentanément indisponible. Réessaie.");
     }
     setLoading(false);
   }
