@@ -6,6 +6,7 @@ import { Wand2, Loader2 } from "lucide-react";
 import { ImageDrop } from "@/components/create/image-drop";
 import { Button } from "@/components/ui/button";
 import { PROMPT_SUGGESTIONS } from "@/lib/constants";
+import { setPendingGeneration } from "@/lib/generation-store";
 
 export function CreateStudio({
   remaining,
@@ -18,7 +19,6 @@ export function CreateStudio({
   const [reference, setReference] = useState<File | null>(null);
   const [prompt, setPrompt] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const router = useRouter();
 
@@ -31,9 +31,8 @@ export function CreateStudio({
     );
   }
 
-  async function generate() {
+  function generate() {
     setError(null);
-    setInfo(null);
     if (!source) {
       setError("Importe d'abord une photo.");
       return;
@@ -46,29 +45,10 @@ export function CreateStudio({
       setError("Tu as utilisé toutes tes générations d'essai.");
       return;
     }
+
+    setPendingGeneration({ source, reference, prompt: prompt.trim() });
     setBusy(true);
-    try {
-      const fd = new FormData();
-      fd.append("source", source);
-      if (reference) fd.append("reference", reference);
-      fd.append("prompt", prompt.trim());
-
-      const res = await fetch("/api/generate", { method: "POST", body: fd });
-      const data = (await res.json().catch(() => ({}))) as {
-        id?: string;
-        error?: string;
-      };
-
-      if (!res.ok || !data.id) {
-        setError(data.error ?? "La génération a échoué. Réessaie.");
-        setBusy(false);
-        return;
-      }
-      router.push(`/result?id=${data.id}`);
-    } catch {
-      setError("Erreur réseau. Vérifie ta connexion et réessaie.");
-      setBusy(false);
-    }
+    router.push("/processing");
   }
 
   return (
@@ -137,11 +117,6 @@ export function CreateStudio({
         {error && (
           <p role="alert" className="text-sm text-danger">
             {error}
-          </p>
-        )}
-        {info && (
-          <p role="status" className="text-sm text-success">
-            {info}
           </p>
         )}
 
