@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { PLANS, PLAN_BENEFITS, type PlanId } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-export function Paywall({ previewSrc }: { previewSrc: string }) {
+export function Paywall({
+  previewSrc,
+  generationId,
+}: {
+  previewSrc: string;
+  generationId: string;
+}) {
   const [plan, setPlan] = useState<PlanId>("yearly");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +24,7 @@ export function Paywall({ previewSrc }: { previewSrc: string }) {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, generationId }),
       });
       const data = (await res.json().catch(() => ({}))) as {
         url?: string;

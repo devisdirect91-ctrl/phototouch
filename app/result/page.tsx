@@ -126,7 +126,7 @@ export default async function ResultPage({
   return (
     <div>
       <AppHeader />
-      <Paywall previewSrc={previewSrc} />
+      <Paywall previewSrc={previewSrc} generationId={gen.id} />
     </div>
   );
 }
