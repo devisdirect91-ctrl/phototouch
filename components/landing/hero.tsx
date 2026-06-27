@@ -5,6 +5,7 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 
 function HeroVisual() {
   return (
@@ -99,6 +100,7 @@ export function Hero() {
           >
             <Link
               href="/auth/signup"
+              onClick={() => track("landing_cta_clicked")}
               className={cn(buttonVariants({ size: "lg" }), "group")}
             >
               Commencer gratuitement

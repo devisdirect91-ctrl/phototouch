@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sparkles, Lock, Check, ShieldCheck, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PLANS, PLAN_BENEFITS, type PlanId } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 
 export function Paywall({
   previewSrc,
@@ -17,9 +18,14 @@ export function Paywall({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    track("paywall_viewed");
+  }, []);
+
   async function checkout() {
     setLoading(true);
     setError(null);
+    track("checkout_initiated", { plan });
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",

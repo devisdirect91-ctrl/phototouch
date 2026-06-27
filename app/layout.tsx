@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/lib/constants";
+import { PostHogProvider } from "@/components/analytics/posthog-provider";
 
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -52,7 +53,9 @@ export default function RootLayout({
       lang="fr"
       className={`${display.variable} ${sans.variable} ${mono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <PostHogProvider>{children}</PostHogProvider>
+      </body>
     </html>
   );
 }

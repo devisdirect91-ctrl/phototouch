@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { track } from "@/lib/analytics";
 
 const inputClass =
   "w-full rounded-xl bg-surface-raised px-4 py-3 text-ink ring-1 ring-hairline placeholder:text-ink-faint transition focus:outline-none focus:ring-2 focus:ring-brand-bright/70";
@@ -59,6 +60,8 @@ export function SignupForm() {
       setError(err.message);
       return;
     }
+    track("signup_completed");
+    fetch("/api/welcome", { method: "POST" }).catch(() => {});
     if (data.session) {
       router.push("/create");
       router.refresh();

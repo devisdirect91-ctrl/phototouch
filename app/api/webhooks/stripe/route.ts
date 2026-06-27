@@ -3,6 +3,11 @@ import { headers } from "next/headers";
 import type Stripe from "stripe";
 import { getStripe, mapSubscriptionStatus } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  sendPaymentSucceededEmail,
+  sendPaymentFailedEmail,
+  sendSubscriptionCanceledEmail,
+} from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -56,9 +61,21 @@ export async function POST(request: Request) {
   switch (event.type) {
     case "customer.subscription.created":
     case "customer.subscription.updated":
-    case "customer.subscription.deleted":
       await syncSubscription(event.data.object as Stripe.Subscription);
       break;
+    case "customer.subscription.deleted": {
+      const sub = event.data.object as Stripe.Subscription;
+      await syncSubscription(sub);
+      const customerId =
+        typeof sub.customer === "string" ? sub.customer : sub.customer.id;
+      const { data: prof } = await admin
+        .from("profiles")
+        .select("email")
+        .eq("stripe_customer_id", customerId)
+        .single();
+      if (prof?.email) await sendSubscriptionCanceledEmail(prof.email);
+      break;
+    }
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.subscription) {
@@ -69,6 +86,18 @@ export async function POST(request: Request) {
         const sub = await stripe.subscriptions.retrieve(subId);
         await syncSubscription(sub);
       }
+      break;
+    }
+    case "invoice.paid": {
+      const inv = event.data.object as Stripe.Invoice;
+      if ((inv.amount_paid ?? 0) > 0 && inv.customer_email) {
+        await sendPaymentSucceededEmail(inv.customer_email);
+      }
+      break;
+    }
+    case "invoice.payment_failed": {
+      const inv = event.data.object as Stripe.Invoice;
+      if (inv.customer_email) await sendPaymentFailedEmail(inv.customer_email);
       break;
     }
     default:

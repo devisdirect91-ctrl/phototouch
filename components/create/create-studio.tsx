@@ -7,6 +7,7 @@ import { ImageDrop } from "@/components/create/image-drop";
 import { Button } from "@/components/ui/button";
 import { PROMPT_SUGGESTIONS } from "@/lib/constants";
 import { setPendingGeneration } from "@/lib/generation-store";
+import { track } from "@/lib/analytics";
 
 export function CreateStudio({
   remaining,
@@ -46,6 +47,7 @@ export function CreateStudio({
       return;
     }
 
+    track("generation_started");
     setPendingGeneration({ source, reference, prompt: prompt.trim() });
     setBusy(true);
     router.push("/processing");
