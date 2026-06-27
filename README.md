@@ -58,7 +58,7 @@ supabase/migrations/  schéma SQL (étape 2)
 - [x] **Étape 6** — Modération (OpenAI omni-moderation : prompts + images, log `moderation_logs`)
 - [x] **Étape 7** — API de génération (`/api/generate` : modération + `gpt-image-1` + storage, câblée au studio → /result)
 - [x] **Étape 8** — Animation d'analyse (`/processing` : scan de la photo, particules, progression, statuts cyclés, retry)
-- [ ] **Étape 9** — Résultat + paywall
+- [x] **Étape 9** — Résultat + paywall (premium net + download ; non-premium flouté côté serveur via `sharp`, gratuité mise en avant)
 - [ ] **Étape 10** — Stripe (checkout, webhooks, billing portal)
 - [ ] **Étape 11** — App connectée (galerie, profil)
 - [ ] **Étape 12** — Emails + analytics + pages légales

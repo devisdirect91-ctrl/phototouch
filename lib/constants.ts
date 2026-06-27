@@ -25,3 +25,23 @@ export const PROMPT_SUGGESTIONS = [
   "Portrait studio",
   "Arrière-plan flou (bokeh)",
 ] as const;
+
+export type PlanId = "monthly" | "yearly";
+
+export const PLANS: {
+  id: PlanId;
+  label: string;
+  price: string;
+  period: string;
+  badge?: string;
+}[] = [
+  { id: "yearly", label: "Annuel", price: "59,99 €", period: "/an", badge: "Économise 50 %" },
+  { id: "monthly", label: "Mensuel", price: "9,99 €", period: "/mois" },
+];
+
+export const PLAN_BENEFITS = [
+  "Générations illimitées",
+  "Haute résolution, sans watermark",
+  "Tous les styles débloqués",
+  "On te prévient avant la fin de l'essai",
+];
